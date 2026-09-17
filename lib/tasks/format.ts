@@ -1,5 +1,4 @@
 import {
-  formatShortDeadline,
   formatTaskDescriptionDate,
 } from "@/lib/datetime/jerusalem"
 import { taskTypeById } from "@/lib/tasks/catalog"
@@ -29,7 +28,7 @@ export function buildTitle(snapshot: FormSnapshot): string {
   return clip(withoutEmDash(`${type.label} · ${client} · ${snapshot.opener}`), 255)
 }
 
-export function buildDescription(
+function buildDescriptionBody(
   snapshot: FormSnapshot,
   analysis: AnalyzeResult | null,
   due: Date,
@@ -145,39 +144,30 @@ export function buildDescription(
     blocks.push("", "אזהרות", ...analysis.warnings.map(withoutEmDash))
   }
 
-  return clip(withoutEmDash(blocks.join("\n")), 5000)
+  return withoutEmDash(blocks.join("\n"))
+}
+
+export function buildDescription(
+  snapshot: FormSnapshot,
+  analysis: AnalyzeResult | null,
+  due: Date,
+): string {
+  return clip(buildDescriptionBody(snapshot, analysis, due), 5000)
 }
 
 export function buildWhatsappText(
   snapshot: FormSnapshot,
   due: Date,
   analysis: AnalyzeResult | null,
+  task?: { id: number; title: string },
 ): string {
-  const type = taskTypeById(snapshot.taskType)
-  const client = clientNameFrom(snapshot) || "לא צוין"
-  const missing = analysis?.missing[0]?.label
-  const need =
-    snapshot.needToDo.trim() ||
-    String(snapshot.fields.otherDescription || "").trim() ||
-    analysis?.summary ||
-    type.shortLabel
+  const title = task?.title || buildTitle(snapshot)
+  const body = buildDescriptionBody(snapshot, analysis, due)
+  const header = [
+    "משימה חדשה נפתחה",
+    `*${title}*`,
+    task?.id ? `מספר משימה בקאלי: ${task.id}` : "",
+  ].filter(Boolean)
 
-  const lines = [
-    `משימה חדשה · *${type.shortLabel}*`,
-    "",
-    `לקוח: ${client}`,
-    `פתח: ${snapshot.opener}`,
-    `דדליין: ${formatShortDeadline(due)}`,
-  ]
-
-  if (analysis?.checkFailed) {
-    lines.push("", "שגיאה בבדיקת הטופס. נפתחה כמו שהיא.")
-  }
-
-  if (missing) {
-    lines.push("", `חסר: ${missing}`)
-  }
-
-  lines.push("", `מה צריך: ${clip(need, 180)}`)
-  return withoutEmDash(lines.join("\n"))
+  return withoutEmDash([...header, "", body].join("\n"))
 }

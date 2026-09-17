@@ -41,7 +41,11 @@ export async function POST(req: Request) {
         dueDate: toIso8601Jerusalem(due),
       })
 
-      void sendWhatsapp(buildWhatsappText(snapshot, due, analysis))
+      try {
+        await sendWhatsapp(buildWhatsappText(snapshot, due, analysis, task))
+      } catch (error) {
+        console.error("wasender after create failed", error)
+      }
 
       return Response.json({
         ok: true,

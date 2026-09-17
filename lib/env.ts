@@ -42,9 +42,9 @@ export function wasenderUrl(): string {
   return optional("WASENDER_URL", "https://www.wasenderapi.com/api/send-message")
 }
 
-export function notifyPhones(): string[] {
-  return optional("NOTIFY_PHONES")
-    .split(",")
-    .map((phone) => phone.trim())
+export function notifyDestinations(): string[] {
+  return [optional("NOTIFY_PHONES"), optional("NOTIFY_WHATSAPP_GROUP")]
+    .flatMap((value) => value.split(","))
+    .map((item) => item.trim())
     .filter(Boolean)
 }
