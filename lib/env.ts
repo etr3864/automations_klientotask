@@ -1,5 +1,9 @@
+function cleanEnv(value: string | undefined): string {
+  return (value ?? "").trim().replace(/^["']+|["']+$/g, "").trim()
+}
+
 function required(name: string): string {
-  const value = process.env[name]?.trim()
+  const value = cleanEnv(process.env[name])
   if (!value) {
     throw new Error(`חסר משתנה סביבה ${name}`)
   }
@@ -7,7 +11,22 @@ function required(name: string): string {
 }
 
 function optional(name: string, fallback = ""): string {
-  return process.env[name]?.trim() || fallback
+  return cleanEnv(process.env[name]) || fallback
+}
+
+const SKIP_DESTINATIONS = new Set(["", "none", "null", "undefined", "-", "n/a"])
+
+function splitDestinations(raw: string): string[] {
+  return raw
+    .split(/[,;]+/)
+    .map((item) => cleanEnv(item))
+    .filter((item) => item && !SKIP_DESTINATIONS.has(item.toLowerCase()))
+}
+
+export function notifyDestinations(): string[] {
+  const group = splitDestinations(optional("NOTIFY_WHATSAPP_GROUP"))
+  if (group.length) return group
+  return splitDestinations(optional("NOTIFY_PHONES"))
 }
 
 export function kaliMcpUrl(): string {
@@ -40,11 +59,4 @@ export function wasenderApiKey(): string | null {
 
 export function wasenderUrl(): string {
   return optional("WASENDER_URL", "https://www.wasenderapi.com/api/send-message")
-}
-
-export function notifyDestinations(): string[] {
-  return [optional("NOTIFY_PHONES"), optional("NOTIFY_WHATSAPP_GROUP")]
-    .flatMap((value) => value.split(","))
-    .map((item) => item.trim())
-    .filter(Boolean)
 }

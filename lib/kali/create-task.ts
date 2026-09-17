@@ -1,5 +1,6 @@
 import { kaliMcpUrl } from "@/lib/env"
 import { KALI_DEPARTMENT, KALI_SOURCE, KALI_TASK_TYPE } from "@/lib/kali/defaults"
+import { logError, logInfo } from "@/lib/log"
 import { extractCreatedTask, readMcpPayload, type CreatedKaliTask } from "@/lib/kali/parse"
 import type { KaliPriority } from "@/lib/tasks/priority"
 
@@ -30,6 +31,13 @@ export async function createKaliTask(input: CreateTaskInput): Promise<CreatedKal
 }
 
 async function sendCreate(input: CreateTaskInput): Promise<CreatedKaliTask> {
+  logInfo("kali_create_start", {
+    title: input.title,
+    assigneeId: input.assigneeId,
+    priority: input.priority,
+    dueDate: input.dueDate,
+  })
+
   const res = await fetch(kaliMcpUrl(), {
     method: "POST",
     headers: {
@@ -58,9 +66,12 @@ async function sendCreate(input: CreateTaskInput): Promise<CreatedKaliTask> {
   })
 
   if (!res.ok) {
+    logError("kali_create_http_failed", { status: res.status })
     throw new Error(`קאלי החזיר ${res.status}`)
   }
 
   const payload = await readMcpPayload(res)
-  return extractCreatedTask(payload)
+  const task = extractCreatedTask(payload)
+  logInfo("kali_create_ok", { taskId: task.id, title: task.title })
+  return task
 }
