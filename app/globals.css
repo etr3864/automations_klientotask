@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+:root {
+  --sand: #efe8dc;
+  --ink: #1c1915;
+  --muted: #6b6258;
+  --accent: #0f766e;
+  --accent-ink: #115e59;
+  --accent-soft: #e7f4f0;
+  --glass: rgba(255, 255, 255, 0.58);
+  --line: rgba(255, 255, 255, 0.72);
+  --font-sans: var(--font-heebo);
+}
+
+@theme inline {
+  --font-sans: var(--font-heebo);
+  --color-background: var(--sand);
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(15, 118, 110, 0.16), transparent 55%),
+    radial-gradient(900px 500px at 110% 10%, rgba(180, 83, 9, 0.12), transparent 50%),
+    var(--sand);
+  color: var(--ink);
+}
+
+.glass-panel {
+  border: 1px solid var(--line);
+  background: var(--glass);
+  border-radius: 1.75rem;
+  box-shadow:
+    0 20px 50px rgba(28, 25, 21, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(22px);
+}
+
+@media (min-width: 1024px) {
+  .glass-panel {
+    border-radius: 2rem;
+    box-shadow:
+      0 28px 70px rgba(28, 25, 21, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+
+  .field-input {
+    padding: 0.9rem 1.05rem;
+  }
+}
+
+.field-input {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.8rem 0.95rem;
+  color: var(--ink);
+  outline: none;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+
+.field-input:focus {
+  border-color: rgba(15, 118, 110, 0.45);
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.field-input.field-error {
+  border-color: rgba(190, 18, 60, 0.55);
+  background: rgba(255, 241, 242, 0.92);
+  box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.14);
+}
+
+.field-error-box {
+  border-color: rgba(190, 18, 60, 0.4);
+  background: rgba(255, 241, 242, 0.55);
+}
+
+.field-hint-error {
+  color: #9f1239;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(40px);
+  opacity: 0.7;
+  animation: float 16s ease-in-out infinite;
+}
+
+.orb-a {
+  width: 22rem;
+  height: 22rem;
+  background: rgba(15, 118, 110, 0.28);
+  top: -6rem;
+  right: -4rem;
+}
+
+.orb-b {
+  width: 18rem;
+  height: 18rem;
+  background: rgba(251, 191, 36, 0.22);
+  bottom: 10%;
+  left: -5rem;
+  animation-delay: -6s;
+}
+
+.orb-c {
+  width: 14rem;
+  height: 14rem;
+  background: rgba(255, 255, 255, 0.55);
+  top: 40%;
+  right: 10%;
+  animation-delay: -11s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2rem, 1.5rem, 0) scale(1.06);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.55s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb,
+  .animate-rise {
+    animation: none;
+  }
+}
