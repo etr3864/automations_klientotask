@@ -41,11 +41,7 @@ export async function POST(req: Request) {
         dueDate: toIso8601Jerusalem(due),
       })
 
-      try {
-        await sendWhatsapp(buildWhatsappText(snapshot, due, analysis))
-      } catch (error) {
-        console.error("whatsapp after create failed", error)
-      }
+      void sendWhatsapp(buildWhatsappText(snapshot, due, analysis))
 
       return Response.json({
         ok: true,
@@ -53,7 +49,7 @@ export async function POST(req: Request) {
       })
     } catch (error) {
       console.error("kali create failed", error)
-      await notifyKaliFailure(`${title}\n\n${description}`)
+      void notifyKaliFailure(`${title}\n\n${description}`)
       return jsonError("לא הצלחנו לפתוח את המשימה, נסו שוב", 502)
     }
   } catch (error) {
